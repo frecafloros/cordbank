@@ -13,18 +13,19 @@ class LSTM_Decoder(Chain):
         embed_size:  単語をベクトル表現したときのベクトルのサイズ
         hidden_size: 隠れ層のサイズ
         """
-        super(LSTM_Decoder).__init__()
-        with self.init_scope():
+        super(LSTM_Decoder, self).__init__(
+        # with self.init_scope():
             # word 2 vector(embedded) 層
-            self.ye = L.EmbedID(vocab_size, embed_size, ignore_label=-1)
+            ye = L.EmbedID(vocab_size, embed_size, ignore_label=-1),
             # embeddedをhiddenの4倍のサイズに拡大する層
-            self.eh = L.Linear(embed_size, 4*hidden_size)
+            eh = L.Linear(embed_size, 4*hidden_size),
             # hiddenを4倍のサイズにする層
-            self.hh = L.Linear(hidden_size, 4*hidden_size)
+            hh = L.Linear(hidden_size, 4*hidden_size),
             # 出力vectorを単語vectorのサイズに変換する層
-            self.he = L.Linear(hidden_size, embed_size)
+            he = L.Linear(hidden_size, embed_size),
             # 単語vectorを語彙サイズのvectorに変換する層
-            self.ey = L.Linear(embed_size, vocab_size)
+            ey = L.Linear(embed_size, vocab_size)
+        )
 
     def __call__(self, y, c, h):
         """

@@ -2,14 +2,56 @@
 
 import numpy as np
 from seq2seq import Seq2Seq
+from forward import forward
 from chainer import optimizer, optimizers, serializers, Variable
-import random
+import random, sys, os, csv, collections
 
-VOCAB_SIZE = 1
-EMBED_SIZE = 1
-HIDDEN_SIZE = 1
-BATCH_SIZE = 1
-EPOCH_NUM = 1
+sd = os.path.dirname(__file__)
+sys.path.append(sd)
+
+argvs = sys.argv
+argc = len(argvs)
+
+print(argvs)
+print(argc)
+if(argc != 3):
+    print("usage: python train.py [enc filename] [dec filename]")
+    quit()
+
+VOCAB_SIZE = 10000
+EMBED_SIZE = 300
+HIDDEN_SIZE = 150
+BATCH_SIZE = 40
+EPOCH_NUM = 2
+
+enc_dict = collections.defaultdict(lambda: len(enc_dict))
+dec_dict = collections.defaultdict(lambda: len(dec_dict))
+
+def output_dict(outdict, filename):
+    with open('%s.csv'%(filename), 'w') as fd:
+        writer = csv.writer(fd)
+        writer.writerows(outdict.items())
+
+def make_data():
+    data = []
+
+    with open(argvs[1], 'r') as f_enc:
+        enc_reader = csv.reader(f_enc)
+        for enc_row in enc_reader:
+            # data.append([enc_row[0].split()])
+            data.append([[enc_dict[word.lower()] for word in enc_row[0].split()]])
+    output_dict(dict(enc_dict), 'JEC_bs_ja_id')
+
+    with open(argvs[2], 'r') as f_dec:
+        dec_reader = csv.reader(f_dec)
+        ct = 0
+        for dec_row in dec_reader:
+            # data[ct].append(dec_row[0].split())
+            data[ct].append([dec_dict[word] for word in dec_row[0].split()])
+            ct += 1
+    output_dict(dict(dec_dict), 'JEC_bs_en_id')
+
+    return data
 
 def make_minibatch(minibatch):
     # enc_wordsの作成
@@ -47,7 +89,7 @@ def train():
         opt.add_hook(optimizer.GradientClipping(5))
 
         # 学習データ読み込み
-        data = # うまいこと読み込む
+        data = make_data()
         # データのシャッフル
         random.shuffle(data)
 
@@ -67,6 +109,12 @@ def train():
             # 計算した勾配を使ってネットワークを更新
             opt.update()
             # 記録された勾配を初期化
-            opt.zero_grads()
+            opt.use_cleargrads(use=False)
+        print('epoch %s is ended' %(epoch+1))
         # epochごとにモデル保存
+        outputpath = 'ja2en_EMB%s_H%s_B%s_EP%s.weights'%(EMBED_SIZE, HIDDEN_SIZE, BATCH_SIZE, epoch+1)
         serializers.save_hdf5(outputpath, model)
+
+print('start')
+train()
+print('end')

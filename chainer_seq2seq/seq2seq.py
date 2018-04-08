@@ -16,11 +16,12 @@ class Seq2Seq(Chain):
         hidden_size:中間ベクトルのサイズ
         batch_size: ミニバッチのサイズ
         """
-        super(Seq2Seq, self).__init__()
-        with self.init_scope:
+        super(Seq2Seq, self).__init__(
+        # with self.init_scope:
             # encoder, decoderのインスタンス化
-            encoder = LSTM_Encoder(vocab_size, embed_size, hidden_size)
+            encoder = LSTM_Encoder(vocab_size, embed_size, hidden_size),
             decoder = LSTM_Decoder(vocab_size, embed_size, hidden_size)
+        )
         self.vocab_size = vocab_size
         self.embed_size = embed_size
         self.hidden_size = hidden_size
