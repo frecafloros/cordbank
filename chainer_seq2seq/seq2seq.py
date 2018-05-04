@@ -53,6 +53,7 @@ class Seq2Seq(Chain):
         w:  単語
         return: 単語数サイズのベクトルを出力
         """
+        # print(w, w.dtype, "2")
         t, self.c, self.h = self.decoder(w, self.c, self.h)
         return t
 

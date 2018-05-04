@@ -26,15 +26,17 @@ def forward(enc_words, dec_words, model, ARR):
     # 損失の初期化
     loss = Variable(ARR.zeros((), dtype='float32'))
 
-    # <eos>をデコーダーに読み込ませる(2)
-    t = Variable(ARR.array([0 for _ in range(batch_size)], dtype='int32'))
+    # <s>をデコーダーに読み込ませる(2)
+    t = Variable(ARR.array([1 for _ in range(batch_size)], dtype='int32'))
 
     # デコーダーの計算
     for w in dec_words:
         # 1単語ずつデコードする(3)
         y = model.decode(t)
+        # print("decode[y]:", y)
         # 正解単語をVariable型に変換
         t = Variable(ARR.array(w, dtype='int32'))
+        # print("answer[t]:", t)
         # 正解単語と予測単語を照らし合わせて損失を計算(4)
         loss += F.softmax_cross_entropy(y,t)
 

@@ -37,9 +37,12 @@ class LSTM_Decoder(Chain):
         予測単語、次代の内部メモリと隠れ層を返す
         """
         # yeで単語vectorに変換、tanhにかける
+        # print(self.ye(y), self.ye(y).dtype, "3")
         e = F.tanh(self.ye(y))
         # 前の内部メモリ、単語vector*4 + hidden vector*4を入力
         c, h = F.lstm(c, self.eh(e)+self.hh(h))
         # 出力されたhidden vectorを単語vector -> 出力vectorのサイズにリサイズ
         t = self.ey(F.tanh(self.he(h)))
+        # print(t.data.argmax(1)[0], "4")
+        # t = t.data.argmax(1)[0]
         return t, c, h
